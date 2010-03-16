@@ -1,6 +1,6 @@
 ;;; ac-predictive.el --- Auto-complete source for predictive-mode
 
-;; Copyright (C) 2009  KOSAKA Tomohiko
+;; Copyright (C) 2009-2010  KOSAKA Tomohiko
 
 ;; Author: KOSAKA Tomohiko <tomohiko.kosaka@gmail.com>
 ;; Keywords: convenience
@@ -25,7 +25,12 @@
 ;; see http://www.dr-qubit.org/emacs.php#predictive
 
 
-;;; Installagion:
+;;; Requirements:
+;;; 
+;;; 1. predictive-mode.el.
+;;; 2. auto-complete.el (version 1.2 or higher).
+
+;;; Installation:
 ;;
 ;; 1. Put ac-predictive.el into a directory that Emacs recognizes as a part of `load-path'.
 ;; You can also byte-compile this file.
@@ -39,7 +44,7 @@
 ;;; * Important Notice:
 ;; 1. One of the important features of predictive-mode is learning predicted candidates, 
 ;;    but you cannot make dictionaries learn by using ac-predictive.
-;; 2. Variable `predictive-auto-complete' is set to nil by loading this file.
+;; 2. The variable `predictive-auto-complete' is set to nil by loading this file.
 
 ;;; Setting:
 ;;
@@ -48,8 +53,9 @@
 ;; If you want to change it, set the source like the following:
 ;;
 ;; (setq ac-source-predictive
-;;       '((candidates . ac-predictive-complete)
-;;        (requires . 2)))
+;;       '((candidates . ac-predictive-candidates)
+;;         (symbol . "p")
+;;         (requires . 2)))
 ;;
 ;; This setting enables you to start by only two key-strokes.
 
@@ -66,7 +72,7 @@
     (message "ac-predictive error: %s" var)
     var))
 
-(defun ac-predictive-complete (&optional maxnum)
+(defun ac-predictive-candidates (&optional maxnum)
   "Retrieve predicted candidates by `predictive-comlete'."
   (let ((candidates nil))
     (condition-case var
@@ -75,10 +81,10 @@
       (error (ac-predictive-error var)))
     candidates))
 
-(defvar ac-source-predictive
-      '((candidates . ac-predictive-complete)
-        (requires . 3))
-      "Auto-complete source for predictive-mode.")
+(ac-define-source predictive
+  '((candidates . ac-predictive-candidates)
+    (requires . 3)
+    (symbol . "p")))
 
 (defun ac-predictive-setup (&optional disable)
   "Add `ac-source-predictive' to the last of `ac-sources' when `disable' is nil.
@@ -91,7 +97,6 @@
   (add-hook 'predictive-mode-hook 'ac-predictive-setup)
   (add-hook 'predictive-mode-disable-hook '(lambda ()
                                              (ac-predictive-setup t))))
-
 
 (provide 'ac-predictive)
 ;;; ac-predictive.el ends here
